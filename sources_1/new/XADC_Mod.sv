@@ -2,12 +2,14 @@
 `default_nettype none
 
 
-typedef enum bit [6:0] {
-  XA1 = 8'h16,
-  XA2 = 8'h17,
-  XA3 = 8'h1e,
-  XA4 = 8'h1f
-} port_t;
+package ePort;
+  typedef enum bit [6:0] {
+    XA1 = 8'h16,
+    XA2 = 8'h17,
+    XA3 = 8'h1e,
+    XA4 = 8'h1f
+  } port_t;
+endpackage
 
 /// XADC module wrapper
 module XADC_Mod (

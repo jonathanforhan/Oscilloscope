@@ -2,11 +2,10 @@
 `default_nettype none
 
 
-/// Clock conversion FREQ_IN -> FREQ_OUT
-/// FREQ_OUT must be lower than FREQ_IN
-module Clock_Conv #(
-    parameter int FREQ_IN  = 100_000_000,
-    parameter int FREQ_OUT = 25_175_000
+/// Clock Generator
+module Clock_Gen #(
+    parameter int FREQ_IN  = 100_000_000,  // 100MHz
+    parameter int FREQ_OUT = 25_175_000    // 25.175MHz
 ) (
     input  wire  clk_in,
     output logic clk_out
@@ -14,6 +13,7 @@ module Clock_Conv #(
   localparam int TICKS = FREQ_IN / (FREQ_OUT * 2);
 
   logic [31:0] i;
+  initial i = 0;
 
   always_ff @(posedge clk_in) begin
     if (i == TICKS) begin
