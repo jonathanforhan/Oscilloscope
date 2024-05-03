@@ -5,7 +5,7 @@
 module Oscilloscope (
     input wire clk_100MHz,
     input wire [7:0] xadc,  // JXADC ports
-    input wire [15:0] freq,
+    output logic [15:0] led,
     output logic [639:0][9:0] ch1,
     output logic [639:0][9:0] ch2
 );
@@ -31,10 +31,11 @@ module Oscilloscope (
   );
 
   logic clk_osc;
+  logic [15:0] freq;
   logic [31:0] i;
 
   always_ff @(posedge clk_100MHz) begin
-    if (i >= (100_000_000 / (freq * 2)) >> 1) begin
+    if (i >= (100_000_000 / freq) >> 3) begin
       i <= 0;
       clk_osc <= ~clk_osc;
     end else begin
@@ -54,10 +55,14 @@ module Oscilloscope (
         ch2[counter] <= 479 - ((data * 479) / UINT16_MAX);
         port <= XA3;
       end
-      XA3: port <= XA4;
+      XA3: begin
+        freq <= data;
+        led  <= data;
+        port <= XA4;
+      end
       default: begin
-        port <= XA1;
         counter <= counter == 639 ? 0 : counter + 1;
+        port <= XA1;
       end
     endcase
   end

@@ -5,12 +5,12 @@
 module Top (
     input wire clk,
     input wire [7:0] JXADC,
-    input wire [15:0] sw,
     output wire Hsync,
     output wire Vsync,
     output wire [3:0] vgaRed,
     output wire [3:0] vgaBlue,
     output wire [3:0] vgaGreen,
+    output wire [15:0] led,
     //-- PULLUP (see contraints)
     output wire [3:0] an
 );
@@ -53,7 +53,7 @@ module Top (
   Oscilloscope oscilloscope (
       .clk_100MHz(clk),
       .xadc      (JXADC),
-      .freq      (sw),
+      .led       (led),
       .ch1       (ch1),
       .ch2       (ch2)
   );
@@ -68,8 +68,6 @@ module Top (
         rgb <= 12'b1111_1111_1111;
       end else if (y == ch2[x]) begin
         rgb <= 12'b0000_1111_1111;
-      end else if (x == 0 || y == 479) begin
-        rgb <= 12'b1000_1000_1000;
       end else if (x % 60 == 0 || y % 48 == 0) begin
         rgb <= 12'b0001_0001_0001;
       end else begin
