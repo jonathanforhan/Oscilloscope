@@ -2,24 +2,22 @@
 `default_nettype none
 
 
-/// Clock Generator
-module Clock_Gen #(
-    parameter int FREQ_IN  = 100_000_000,  // 100MHz
-    parameter int FREQ_OUT = 25_175_000    // 25.175MHz
+/// Variable Frequency Clock Generator
+module Clock_Var_Gen #(
+    parameter int FREQ_IN = 100_000_000  // 100MHz
 ) (
-    input  wire  clk_in,
-    input  wire  rst,
+    input wire clk_in,
+    input wire rst,
+    input wire [31:0] freq,
     output logic clk_out
 );
-  localparam int TICKS = FREQ_IN / (FREQ_OUT * 2);
-
   logic [31:0] i = 0;
 
   always_ff @(posedge clk_in, posedge rst) begin
     if (rst) begin
       i <= 0;
     end else begin
-      if (i == TICKS) begin
+      if (i >= FREQ_IN / (freq * 2)) begin
         i <= 0;
         clk_out <= ~clk_out;
       end else begin

@@ -1,0 +1,5 @@
+[verilog]
+include_paths = ["*.srcs/**"]
+
+[option]
+linter = true

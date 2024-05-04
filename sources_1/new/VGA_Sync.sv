@@ -14,6 +14,7 @@ module VGA_Sync #(
     parameter int V_RETRACE = 2  // vertical retrace
 ) (
     input wire clk,
+    input wire rst,
     input wire [11:0] rgb_in,
     output wire vidstate,
     output wire hsync,
@@ -30,18 +31,18 @@ module VGA_Sync #(
   localparam int START_V_RETRACE = V_DISPLAY + V_B_BORDER;
   localparam int END_V_RETRACE = V_DISPLAY + V_B_BORDER + V_RETRACE - 1;
 
-  // iterate left->right top->bottom
-  always_ff @(posedge clk) begin
-    if (h == H_MAX) begin
+  // iterate left to right, top to bottom
+  always_ff @(posedge clk, posedge rst) begin
+    if (rst) begin
       h <= 0;
-
-      if (v == V_MAX) begin
-        v <= 0;
-      end else begin
-        v <= v + 1;
-      end
+      v <= 0;
     end else begin
-      h <= h + 1;
+      if (h == H_MAX) begin
+        h <= 0;
+        v <= v == V_MAX ? 0 : v + 1;
+      end else begin
+        h <= h + 1;
+      end
     end
   end
 

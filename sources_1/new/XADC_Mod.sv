@@ -2,7 +2,7 @@
 `default_nettype none
 
 
-package ePort;
+package XADC_Ports;
   typedef enum bit [6:0] {
     XA1 = 8'h16,
     XA2 = 8'h17,

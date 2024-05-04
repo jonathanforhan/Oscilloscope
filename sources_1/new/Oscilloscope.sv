@@ -2,14 +2,15 @@
 `default_nettype none
 
 
+/// Oscilloscope, uses variable frequency from XADC port XA3 and XA4
 module Oscilloscope (
     input wire clk_100MHz,
     input wire [7:0] xadc,  // JXADC ports
     output logic [15:0] led,
-    output logic [639:0][9:0] ch1,
-    output logic [639:0][9:0] ch2
+    output logic [639:0][9:0] ch1,  // channel 1
+    output logic [639:0][9:0] ch2  // channel 2
 );
-  import ePort::*;
+  import XADC_Ports::*;
 
   localparam int UINT16_MAX = 65535;
 
@@ -31,29 +32,26 @@ module Oscilloscope (
   );
 
   logic clk_osc;
-  logic [15:0] freq;
-  logic [31:0] i;
+  logic [31:0] freq;
 
-  always_ff @(posedge clk_100MHz) begin
-    if (i >= (100_000_000 / freq) >> 3) begin
-      i <= 0;
-      clk_osc <= ~clk_osc;
-    end else begin
-      i <= i + 1;
-    end
-  end
+  Clock_Var_Gen clock_osc (
+      .clk_in (clk_100MHz),
+      .rst    (rst),
+      .freq   (freq),
+      .clk_out(clk_osc)
+  );
 
-  logic [9:0] counter;
+  logic [9:0] i = 0;
 
   always_ff @(posedge clk_osc) begin
     case (port)
       XA1: begin
-        ch1[counter] <= 479 - ((data * 479) / UINT16_MAX);
-        port <= XA2;
+        ch1[i] <= 479 - ((data * 479) / UINT16_MAX);
+        port   <= XA2;
       end
       XA2: begin
-        ch2[counter] <= 479 - ((data * 479) / UINT16_MAX);
-        port <= XA3;
+        ch2[i] <= 479 - ((data * 479) / UINT16_MAX);
+        port   <= XA3;
       end
       XA3: begin
         freq <= data;
@@ -61,7 +59,7 @@ module Oscilloscope (
         port <= XA4;
       end
       default: begin
-        counter <= counter == 639 ? 0 : counter + 1;
+        i <= i == 639 ? 0 : i + 1;
         port <= XA1;
       end
     endcase

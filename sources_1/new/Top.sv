@@ -14,26 +14,30 @@ module Top (
     //-- PULLUP (see contraints)
     output wire [3:0] an
 );
+  logic rst = 0;
+
   //--------------------------------------------------------------------------//
   // VGA
   //--------------------------------------------------------------------------//
 
-  wire clk_vga;
+  wire  clk_vga;
 
   Clock_Gen #(
       .FREQ_IN (100_000_000),
       .FREQ_OUT(25_175_000)
   ) clock_vga (
       .clk_in (clk),
+      .rst    (rst),
       .clk_out(clk_vga)
   );
 
-  wire vidstate;
-  logic [9:0] x, y;
   logic [11:0] rgb;
+  wire vidstate;
+  wire [9:0] x, y;
 
   VGA_Sync vga_sync (
       .clk     (clk_vga),
+      .rst     (rst),
       .rgb_in  (rgb),
       .vidstate(vidstate),
       .hsync   (Hsync),
